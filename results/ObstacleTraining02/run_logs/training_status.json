@@ -1,0 +1,38 @@
+{
+    "ObstacleAgent": {
+        "checkpoints": [
+            {
+                "steps": 499989,
+                "file_path": "results\\ObstacleTraining02\\ObstacleAgent\\ObstacleAgent-499989.onnx",
+                "reward": -1.573099970817566,
+                "creation_time": 1788723037.8287795,
+                "auxillary_file_paths": [
+                    "results\\ObstacleTraining02\\ObstacleAgent\\ObstacleAgent-499989.pt"
+                ]
+            },
+            {
+                "steps": 500053,
+                "file_path": "results\\ObstacleTraining02\\ObstacleAgent\\ObstacleAgent-500053.onnx",
+                "reward": -1.573099970817566,
+                "creation_time": 1788723037.8756561,
+                "auxillary_file_paths": [
+                    "results\\ObstacleTraining02\\ObstacleAgent\\ObstacleAgent-500053.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 500053,
+            "file_path": "results\\ObstacleTraining02\\ObstacleAgent.onnx",
+            "reward": -1.573099970817566,
+            "creation_time": 1788723037.8756561,
+            "auxillary_file_paths": [
+                "results\\ObstacleTraining02\\ObstacleAgent\\ObstacleAgent-500053.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.30.0",
+        "torch_version": "1.13.1+cpu"
+    }
+}

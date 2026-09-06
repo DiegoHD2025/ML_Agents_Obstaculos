@@ -10,6 +10,7 @@ public class ObstacleAgent : Agent
     public Transform[] obstacles;
 
     private Rigidbody rb;
+    private float previousDistanceToTarget;
 
     public override void Initialize()
     {
@@ -25,11 +26,20 @@ public class ObstacleAgent : Agent
         // Colocar al agente en su posición inicial
         transform.localPosition = new Vector3(0f, 0.5f, -3f);
 
+        // Colocar el Target aleatoriamente
         float randomX = Random.Range(-4f, 4f);
-	float randomZ = Random.Range(1f, 4f);
-	
-	target.localPosition = new Vector3(randomX, 0.5f, randomZ);
-	RepositionObstacles();
+        float randomZ = Random.Range(1f, 4f);
+
+        target.localPosition = new Vector3(randomX, 0.5f, randomZ);
+
+        // Reposicionar obstáculos
+        RepositionObstacles();
+
+        // Guardar distancia inicial al Target
+        previousDistanceToTarget = Vector3.Distance(
+            transform.localPosition,
+            target.localPosition
+        );
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -67,13 +77,13 @@ public class ObstacleAgent : Agent
 
                 // Evitar la posición inicial del Agent
                 Vector3 agentStart = new Vector3(0f, 0.5f, -3f);
-    
+
                 if (Vector3.Distance(newPosition, agentStart) < 1.5f)
                 {
                     validPosition = false;
                 }
 
-            // Evitar el Target
+                // Evitar el Target
                 if (Vector3.Distance(newPosition, target.localPosition) < 1.5f)
                 {
                     validPosition = false;
@@ -82,7 +92,9 @@ public class ObstacleAgent : Agent
                 // Evitar otros obstáculos
                 for (int j = 0; j < i; j++)
                 {
-                    if (Vector3.Distance(newPosition, obstacles[j].localPosition) < 1.5f)
+                    if (Vector3.Distance(
+                        newPosition,
+                        obstacles[j].localPosition) < 1.5f)
                     {
                         validPosition = false;
                         break;
@@ -106,7 +118,28 @@ public class ObstacleAgent : Agent
 
         rb.AddForce(movement * moveSpeed);
 
-	AddReward(-0.001f);
+        // Calcular distancia actual al Target
+        float currentDistanceToTarget = Vector3.Distance(
+            transform.localPosition,
+            target.localPosition
+        );
+
+        // Recompensar si se acerca
+        if (currentDistanceToTarget < previousDistanceToTarget)
+        {
+            AddReward(0.01f);
+        }
+        else
+        {
+            // Penalizar ligeramente si se aleja
+            AddReward(-0.01f);
+        }
+
+        // Guardar la nueva distancia
+        previousDistanceToTarget = currentDistanceToTarget;
+
+        // Pequeña penalización por consumir tiempo
+        AddReward(-0.0001f);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -119,16 +152,24 @@ public class ObstacleAgent : Agent
 
     private void OnCollisionEnter(Collision collision)
     {
+        // Llegó al Target
         if (collision.gameObject.CompareTag("Target"))
         {
             AddReward(1.0f);
+            EndEpisode();
+        }
 
+        // Chocó contra un obstáculo
+        if (collision.gameObject.CompareTag("Obstacle"))
+        {
+            AddReward(-0.5f);
             EndEpisode();
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        // Entró en la DeathZone
         if (other.CompareTag("DeathZone"))
         {
             AddReward(-1.0f);
@@ -136,3 +177,4 @@ public class ObstacleAgent : Agent
         }
     }
 }
+
